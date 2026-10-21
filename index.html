@@ -3,1593 +3,1256 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily XP Grind - Level Up Your Life</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Inter, Chakra Petch (Sci-Fi), Press Start 2P (Retro 80s Arcade), Outfit (Neumorphic Glass/Minimal) -->
+  <title>daily xp grind tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700;800&family=Inter:wght@400;500;600;700&family=Press+Start+2P&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Canvas Confetti -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
-    /* CSS Variables driven by the theme customizer */
-    :root {
-      --bg-main: #0b0e14;
-      --bg-header: rgba(17, 21, 28, 0.85);
-      --bg-card: #161b22;
-      --bg-subtle: #0d1117;
-      --border-color: rgba(48, 54, 61, 0.8);
-      --primary: #8b5cf6;
-      --primary-glow: rgba(139, 92, 246, 0.35);
-      --secondary: #06b6d4;
-      --secondary-glow: rgba(6, 182, 212, 0.35);
-      --accent: #ec4899;
-      --text-main: #f1f5f9;
-      --text-muted: #94a3b8;
-      --radius-box: 1.25rem;
-      --radius-btn: 0.75rem;
-      --font-body: 'Inter', sans-serif;
-      --font-title: 'Chakra Petch', sans-serif;
-      --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
-      --hud-border-style: solid;
-      --hud-border-width: 1px;
+    /* strict global lowercase */
+    *, *::before, *::after, button, input, textarea, select {
+      text-transform: lowercase !important;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'JetBrains Mono', monospace;
     }
 
-    /* Template 1: Cyber Hunter / Sci-Fi HUD */
-    body[data-template="cyber"] {
-      --font-title: 'Chakra Petch', sans-serif;
-      --font-body: 'Inter', sans-serif;
-      --radius-box: 0.85rem;
-      --radius-btn: 0.5rem;
-      --hud-border-width: 1px;
+    :root {
+      --bg: #070908;
+      --card-bg: rgba(14, 20, 17, 0.85);
+      --card-border: rgba(0, 255, 136, 0.2);
+      --primary: #00ff88;
+      --primary-glow: rgba(0, 255, 136, 0.4);
+      --primary-dim: rgba(0, 255, 136, 0.1);
+      --text: #e2fced;
+      --text-muted: #6e8a7c;
+      --accent-warn: #ef4444;
+      --accent-gold: #f59e0b;
+      --font-scale: 1;
     }
-    body[data-template="cyber"] .themed-card {
-      border: 1px solid var(--border-color);
-      box-shadow: 0 0 18px var(--primary-glow), inset 0 0 10px rgba(0,0,0,0.4);
+
+    /* theme palettes */
+    body.theme-cyan {
+      --bg: #06090e;
+      --card-bg: rgba(11, 19, 29, 0.85);
+      --card-border: rgba(0, 240, 255, 0.25);
+      --primary: #00f0ff;
+      --primary-glow: rgba(0, 240, 255, 0.4);
+      --primary-dim: rgba(0, 240, 255, 0.1);
+      --text: #e0faff;
+      --text-muted: #5e7a88;
+    }
+
+    body.theme-amber {
+      --bg: #0a0805;
+      --card-bg: rgba(22, 17, 12, 0.85);
+      --card-border: rgba(245, 158, 11, 0.25);
+      --primary: #f59e0b;
+      --primary-glow: rgba(245, 158, 11, 0.4);
+      --primary-dim: rgba(245, 158, 11, 0.1);
+      --text: #fef3c7;
+      --text-muted: #8b7355;
+    }
+
+    body.theme-magenta {
+      --bg: #090508;
+      --card-bg: rgba(22, 12, 20, 0.85);
+      --card-border: rgba(255, 0, 128, 0.25);
+      --primary: #ff0080;
+      --primary-glow: rgba(255, 0, 128, 0.4);
+      --primary-dim: rgba(255, 0, 128, 0.1);
+      --text: #ffe4f3;
+      --text-muted: #8c5d79;
+    }
+
+    body.theme-obsidian {
+      --bg: #0a0a0a;
+      --card-bg: rgba(18, 18, 18, 0.9);
+      --card-border: rgba(255, 255, 255, 0.18);
+      --primary: #e5e5e5;
+      --primary-glow: rgba(255, 255, 255, 0.3);
+      --primary-dim: rgba(255, 255, 255, 0.08);
+      --text: #f5f5f5;
+      --text-muted: #737373;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 1rem 3rem;
+      background-image: 
+        radial-gradient(circle at 50% 0%, var(--primary-dim) 0%, transparent 60%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 32px 32px, 32px 32px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* common card style */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      transition: border-color 0.3s ease;
+    }
+
+    /* section 1: controls & personalization */
+    .controls-grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px dashed var(--card-border);
+      font-size: 0.8rem;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .control-label {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+    }
+
+    .pill-btn {
+      background: var(--primary-dim);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .pill-btn:hover {
+      border-color: var(--primary);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .pill-btn.active {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #000;
+      font-weight: 700;
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    .pill-btn.danger {
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .pill-btn.danger:hover {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.25);
+    }
+
+    /* avatar chooser */
+    .avatar-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .avatar-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      border: 2px solid var(--card-border);
+      background: #0d1310;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      padding: 3px;
+    }
+
+    .avatar-btn svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .avatar-btn:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .avatar-btn.selected {
+      border-color: var(--primary);
+      box-shadow: 0 0 12px var(--primary-glow);
+      background: var(--primary-dim);
+    }
+
+    /* section 2: character status hud */
+    .status-hud {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .current-avatar-preview {
+      width: 70px;
+      height: 70px;
+      border-radius: 12px;
+      border: 2px solid var(--primary);
+      box-shadow: 0 0 16px var(--primary-glow);
+      background: #000;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .current-avatar-preview svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .hud-main {
+      flex: 1;
+      min-width: 250px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .hud-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .level-badge {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary);
+      text-shadow: 0 0 8px var(--primary-glow);
+    }
+
+    .rank-title {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      border-left: 2px solid var(--card-border);
+      padding-left: 0.5rem;
+      margin-left: 0.5rem;
+    }
+
+    .xp-counter-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .xp-counter-text span {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    /* progress bar */
+    .bar-track {
+      width: 100%;
+      height: 14px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 7px;
+      overflow: hidden;
       position: relative;
     }
-    body[data-template="cyber"] .themed-card::before {
-      content: "";
-      position: absolute;
-      top: -1px; left: 10px; width: 24px; height: 2px;
-      background: var(--secondary);
+
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #ffffff);
+      width: 0%;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 10px var(--primary);
     }
 
-    /* Template 2: Dark Minimal RPG */
-    body[data-template="minimal"] {
-      --font-title: 'Outfit', sans-serif;
-      --font-body: 'Inter', sans-serif;
-      --radius-box: 0.5rem;
-      --radius-btn: 0.375rem;
-      --hud-border-width: 1px;
-    }
-    body[data-template="minimal"] .themed-card {
-      border: 1px solid var(--border-color);
-      box-shadow: none;
-      background: var(--bg-card);
+    .hud-footer-metrics {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+      gap: 0.5rem;
     }
 
-    /* Template 3: Retro Arcade Pixel 80s */
-    body[data-template="retro"] {
-      --font-title: 'Press Start 2P', monospace;
-      --font-body: 'Chakra Petch', sans-serif;
-      --radius-box: 0px;
-      --radius-btn: 0px;
-      --hud-border-width: 3px;
-    }
-    body[data-template="retro"] .themed-card {
-      border: 3px solid var(--primary);
-      box-shadow: 5px 5px 0px 0px rgba(0,0,0,0.9);
-      image-rendering: pixelated;
-    }
-    body[data-template="retro"] button, body[data-template="retro"] input, body[data-template="retro"] textarea {
-      border-radius: 0px !important;
-    }
-    body[data-template="retro"] .retro-header-tag {
-      font-size: 0.65rem !important;
-      line-height: 1.3;
+    .metric-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid var(--card-border);
     }
 
-    /* Template 4: Clean Neumorphic Glass */
-    body[data-template="glass"] {
-      --font-title: 'Outfit', sans-serif;
-      --font-body: 'Outfit', sans-serif;
-      --radius-box: 1.75rem;
-      --radius-btn: 1rem;
-      --hud-border-width: 1px;
-    }
-    body[data-template="glass"] .themed-card {
-      background: rgba(22, 27, 34, 0.65) !important;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    .metric-pill strong {
+      color: var(--primary);
     }
 
-    /* General application styling hookups */
-    body {
-      background-color: var(--bg-main);
-      color: var(--text-main);
-      font-family: var(--font-body);
-      min-height: 100vh;
-      transition: background-color 0.25s ease, color 0.25s ease;
+    /* section 3: quest entry console */
+    .entry-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
     }
 
-    .font-app-title {
-      font-family: var(--font-title);
+    .input-row {
+      display: flex;
+      gap: 0.5rem;
     }
 
-    .themed-card {
-      background-color: var(--bg-card);
-      border-radius: var(--radius-box);
-      transition: all 0.25s ease;
+    .task-input {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    .themed-btn {
-      border-radius: var(--radius-btn);
+    .task-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 10px var(--primary-glow);
     }
 
-    .dynamic-progress-bar {
-      background: linear-gradient(90deg, var(--secondary), var(--primary), var(--accent));
+    .task-input::placeholder {
+      color: var(--text-muted);
+      opacity: 0.6;
     }
 
-    .dynamic-primary-gradient {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-    }
-
-    .custom-scroll::-webkit-scrollbar {
-      width: 6px;
-    }
-    .custom-scroll::-webkit-scrollbar-track {
-      background: var(--bg-subtle);
-    }
-    .custom-scroll::-webkit-scrollbar-thumb {
-      background: var(--border-color);
-      border-radius: 9999px;
-    }
-    .custom-scroll::-webkit-scrollbar-thumb:hover {
+    .submit-btn {
       background: var(--primary);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 0 1.4rem;
+      font-size: 0.9rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 12px var(--primary-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+
+    .submit-btn:hover {
+      filter: brightness(1.15);
+      transform: translateY(-1px);
+    }
+
+    .submit-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* tier buttons & tags */
+    .options-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .tags-container {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .tag-chip {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      padding: 0.2rem 0.5rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tag-chip:hover, .tag-chip.active {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-dim);
+    }
+
+    .custom-xp-input {
+      width: 70px;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 0.25rem 0.4rem;
+      color: var(--text);
+      font-size: 0.75rem;
+      text-align: center;
+      outline: none;
+    }
+
+    .custom-xp-input:focus {
+      border-color: var(--primary);
+    }
+
+    /* section 4: log book & history */
+    .log-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .log-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .log-search {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.75rem;
+      color: var(--text);
+      outline: none;
+      width: 160px;
+    }
+
+    .log-search:focus {
+      border-color: var(--primary);
+    }
+
+    .log-filters {
+      display: flex;
+      gap: 0.4rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .log-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .log-feed::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .log-feed::-webkit-scrollbar-thumb {
+      background: var(--card-border);
+      border-radius: 3px;
+    }
+
+    .log-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 0.6rem 0.8rem;
+      font-size: 0.85rem;
+      animation: fadeIn 0.25s ease-out;
+      transition: border-color 0.15s ease;
+    }
+
+    .log-item:hover {
+      border-color: var(--card-border);
+    }
+
+    .log-item.penalty {
+      border-color: rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.05);
+    }
+
+    .log-item-left {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      overflow: hidden;
+    }
+
+    .log-time {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .log-text {
+      color: var(--text);
+      word-break: break-word;
+    }
+
+    .log-item-right {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .log-xp-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--primary);
+      background: var(--primary-dim);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      border: 1px solid var(--primary-glow);
+    }
+
+    .log-item.penalty .log-xp-badge {
+      color: #f87171;
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+
+    .delete-item-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.85rem;
+      padding: 2px 4px;
+      transition: color 0.15s;
+    }
+
+    .delete-item-btn:hover {
+      color: #ef4444;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border: 1px dashed var(--card-border);
+      border-radius: 8px;
+    }
+
+    /* floating xp toast */
+    .floating-xp {
+      position: fixed;
+      pointer-events: none;
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: var(--primary);
+      text-shadow: 0 0 10px var(--primary-glow);
+      animation: floatUp 1.2s forwards cubic-bezier(0.1, 0.9, 0.2, 1);
+      z-index: 1000;
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 0; transform: translateY(0) scale(0.7); }
+      20% { opacity: 1; transform: translateY(-15px) scale(1.1); }
+      80% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(-50px) scale(1); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .input-row {
+        flex-direction: column;
+      }
+      .submit-btn {
+        padding: 0.75rem;
+      }
+      .options-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
-<body data-template="cyber" data-palette="cyberpunk" class="flex flex-col justify-between selection:bg-purple-600 selection:text-white">
+<body class="theme-lime">
 
-  <!-- Header Bar -->
-  <header style="background-color: var(--bg-header); border-color: var(--border-color);" class="border-b backdrop-blur-md sticky top-0 z-40 transition-colors">
-    <div class="max-w-6xl mx-auto px-4 py-3 sm:px-6 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div style="box-shadow: 0 0 15px var(--primary-glow);" class="w-10 h-10 dynamic-primary-gradient themed-btn flex items-center justify-center font-app-title font-extrabold text-xl text-white shadow-lg">
-          XP
-        </div>
-        <div>
-          <h1 class="text-lg font-bold font-app-title tracking-wider" style="color: var(--text-main);">
-            DAILY XP GRIND
-          </h1>
-          <p class="text-xs" style="color: var(--text-muted);">Level up by logging tasks & stay on streak</p>
-        </div>
-      </div>
-
-      <!-- Action & Customizer Buttons -->
-      <div class="flex items-center gap-2">
-        <button id="themeModalOpenBtn" class="themed-btn px-3 py-1.5 border text-xs font-semibold flex items-center gap-1.5 transition hover:scale-105 active:scale-95" style="border-color: var(--primary); background: var(--bg-card); color: var(--text-main);">
-          <span>🎨</span>
-          <span class="font-app-title">Themes & Layout</span>
-        </button>
-
-        <button id="soundToggleBtn" class="themed-btn px-3 py-1.5 border text-xs font-semibold flex items-center gap-1.5 transition" style="border-color: var(--border-color); background: var(--bg-card); color: var(--text-main);">
-          <span id="soundIcon">🔊</span>
-          <span id="soundStatusText" class="hidden sm:inline">Audio</span>
-        </button>
-
-        <button id="resetDataBtn" title="Reset all game progress" class="themed-btn px-3 py-1.5 border border-red-900/60 hover:bg-red-950/40 text-rose-400 text-xs font-semibold transition">
-          Reset
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Game Container -->
-  <main class="max-w-6xl mx-auto px-4 py-6 sm:px-6 flex-1 w-full space-y-6">
-
-    <!-- Active Template / Palette Chip Bar -->
-    <div class="flex flex-wrap items-center justify-between gap-2 px-2 text-xs">
-      <div class="flex items-center gap-2">
-        <span class="text-[11px] uppercase tracking-wider font-semibold" style="color: var(--text-muted);">Current Setup:</span>
-        <span id="activeLayoutBadge" class="px-2.5 py-0.5 rounded-full border text-[11px] font-mono font-bold" style="background: var(--bg-card); border-color: var(--primary); color: var(--primary);">
-          Sci-Fi HUD
-        </span>
-        <span id="activeColorBadge" class="px-2.5 py-0.5 rounded-full border text-[11px] font-mono font-bold" style="background: var(--bg-card); border-color: var(--secondary); color: var(--secondary);">
-          Neon Cyberpunk
-        </span>
-      </div>
-      <button id="quickPresetCycleBtn" class="text-[11px] underline hover:brightness-125 transition" style="color: var(--secondary);">
-        ⚡ Quick Swap Theme
-      </button>
-    </div>
-
-    <!-- Penalty Alert Banner -->
-    <div id="penaltyBanner" class="hidden rounded-xl border border-rose-500/50 bg-rose-950/40 p-4 text-rose-200 animate-pulse flex items-start justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <span class="text-2xl">⚠️</span>
-        <div>
-          <h3 class="font-bold font-app-title text-rose-400">STREAK BROKEN & PENALTY APPLIED!</h3>
-          <p id="penaltyMessage" class="text-xs sm:text-sm text-rose-200/90">You missed days without grinding. XP was penalized to keep you sharp!</p>
-        </div>
-      </div>
-      <button onclick="document.getElementById('penaltyBanner').classList.add('hidden')" class="text-rose-400 hover:text-rose-200 text-xs underline font-semibold">
-        Dismiss
-      </button>
-    </div>
-
-    <!-- Top Dashboard: Hunter Status, Level Progression, Streak -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-5">
-      
-      <!-- Card 1: Player Rank & Info -->
-      <div class="themed-card p-5 relative overflow-hidden flex flex-col justify-between">
-        <div>
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold uppercase tracking-wider font-app-title" style="color: var(--primary);">Hunter Rank</span>
-            <span id="rankBadge" class="px-2.5 py-0.5 text-xs font-bold rounded-full border" style="background: var(--primary-glow); border-color: var(--primary); color: var(--text-main);">
-              Novice
-            </span>
-          </div>
-          <div class="mt-4 flex items-center gap-4">
-            <div class="relative">
-              <div class="w-16 h-16 dynamic-primary-gradient themed-btn flex items-center justify-center text-3xl font-app-title font-extrabold text-white shadow-md">
-                <span id="rankIcon">🗡️</span>
-              </div>
-              <div class="absolute -bottom-2 -right-2 px-2 py-0.5 rounded-md border text-[10px] font-bold font-app-title" style="background: var(--bg-subtle); border-color: var(--secondary); color: var(--secondary);">
-                LV <span id="levelBadgeNumber">1</span>
-              </div>
-            </div>
-            <div>
-              <h2 id="rankTitle" class="text-lg font-extrabold font-app-title" style="color: var(--text-main);">E-Rank Novice</h2>
-              <p class="text-xs" style="color: var(--text-muted);">Cap: Level <span id="maxLevelCapText">100</span></p>
-              <p class="text-[11px] mt-0.5" style="color: var(--text-muted);">Total XP: <span id="totalXpCounter" class="font-mono" style="color: var(--text-main);">0</span></p>
-            </div>
-          </div>
+  <div class="app-container">
+    
+    <!-- CARD 1: CONTROLS, THEMES, AVATARS (ALL IN ONE PLACE) -->
+    <div class="card" style="display: flex; flex-direction: column; gap: 0.8rem;">
+      <!-- Row 1: Themes & Toggles -->
+      <div class="controls-grid">
+        <div class="control-group">
+          <span class="control-label">palette:</span>
+          <button class="pill-btn active" data-theme="theme-lime" onclick="setPalette('theme-lime')">lime</button>
+          <button class="pill-btn" data-theme="theme-cyan" onclick="setPalette('theme-cyan')">cyan</button>
+          <button class="pill-btn" data-theme="theme-amber" onclick="setPalette('theme-amber')">amber</button>
+          <button class="pill-btn" data-theme="theme-magenta" onclick="setPalette('theme-magenta')">magenta</button>
+          <button class="pill-btn" data-theme="theme-obsidian" onclick="setPalette('theme-obsidian')">obsidian</button>
         </div>
 
-        <div class="mt-4 pt-3 border-t flex justify-between items-center text-xs" style="border-color: var(--border-color);">
-          <span style="color: var(--text-muted);">Rank Progress</span>
-          <span id="nextRankRequirement" class="font-mono text-[11px]" style="color: var(--text-main);">Next rank at Lv 5</span>
+        <div class="control-group">
+          <button class="pill-btn" id="soundBtn" onclick="toggleSound()">🔊 sound: on</button>
+          <button class="pill-btn danger" onclick="simulateMissedDay()">⚠️ test missed day penalty</button>
+          <button class="pill-btn danger" onclick="resetAllProgress()">↺ reset all</button>
         </div>
       </div>
 
-      <!-- Card 2: Level & XP Grind Progression -->
-      <div class="themed-card p-5 flex flex-col justify-between">
-        <div class="flex justify-between items-center mb-1">
-          <div class="flex items-baseline gap-2">
-            <span class="text-2xl font-black font-app-title" style="color: var(--text-main);">LVL <span id="currentLevel">1</span></span>
-            <span id="maxLevelTag" class="hidden text-[10px] font-bold px-2 py-0.5 rounded border border-amber-500/50 bg-amber-500/20 text-amber-300">MAX CAP REACHED</span>
-          </div>
-          <span class="text-xs font-semibold font-mono" style="color: var(--text-muted);">
-            <span id="currentXp" style="color: var(--secondary);">0</span> / <span id="xpNeeded">100</span> XP
-          </span>
-        </div>
-
-        <!-- Animated Level Progress Bar -->
-        <div class="space-y-2 my-auto">
-          <div class="w-full h-4 rounded-full p-0.5 border relative overflow-hidden" style="background: var(--bg-subtle); border-color: var(--border-color);">
-            <div id="levelProgressBar" class="h-full dynamic-progress-bar rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
-          </div>
-          <div class="flex justify-between text-[11px]" style="color: var(--text-muted);">
-            <span id="xpPercentageText">0% to Level 2</span>
-            <span>+<span id="remainingXpToLevel">100</span> XP needed</span>
-          </div>
-        </div>
-
-        <!-- Daily XP Cap meter -->
-        <div class="pt-3 border-t" style="border-color: var(--border-color);">
-          <div class="flex justify-between items-center text-xs mb-1">
-            <span class="flex items-center gap-1" style="color: var(--text-muted);">
-              <span>📅 Daily Cap</span>
-              <span class="text-[10px]">(Anti-burnout)</span>
-            </span>
-            <span class="font-mono text-[11px]" style="color: var(--text-main);">
-              <span id="dailyXpAccumulated" style="color: var(--secondary);">0</span> / <span id="dailyCapValue">500</span> XP
-            </span>
-          </div>
-          <div class="w-full h-2 rounded-full overflow-hidden border" style="background: var(--bg-subtle); border-color: var(--border-color);">
-            <div id="dailyCapProgressBar" class="h-full transition-all duration-300" style="background: var(--secondary); width: 0%"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 3: Streak Tracker & Testing Lab -->
-      <div class="themed-card p-5 flex flex-col justify-between">
-        <div>
-          <div class="flex justify-between items-center">
-            <span class="text-xs font-bold uppercase tracking-wider font-app-title" style="color: var(--accent);">Daily Streak</span>
-            <span class="text-xs" style="color: var(--text-muted);">Reset at Midnight</span>
-          </div>
-
-          <div class="flex items-center gap-3 mt-3">
-            <div class="w-14 h-14 themed-btn flex items-center justify-center text-3xl shadow-lg" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">
-              🔥
-            </div>
-            <div>
-              <div class="text-3xl font-extrabold font-app-title flex items-baseline gap-1" style="color: var(--text-main);">
-                <span id="streakCount">0</span>
-                <span class="text-sm font-normal" style="color: var(--text-muted);">Days</span>
-              </div>
-              <p id="streakStatusText" class="text-xs font-medium text-amber-300/90">No tasks logged today yet!</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Testing penalty simulator -->
-        <div class="pt-3 border-t space-y-2" style="border-color: var(--border-color);">
-          <div class="flex items-center justify-between text-[11px]" style="color: var(--text-muted);">
-            <span>Penalty Engine:</span>
-            <span class="text-rose-400">-50 XP & Streak loss if inactive</span>
-          </div>
-          <button id="simulateMissedDayBtn" class="themed-btn w-full py-1.5 px-3 border text-xs font-semibold flex items-center justify-center gap-1.5 transition hover:brightness-125" style="background: var(--bg-subtle); border-color: var(--border-color); color: var(--text-main);">
-            <span>⏳</span> Simulate +1 Missed Day (Test Penalty)
-          </button>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- Main Grind Workspace -->
-    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-      <!-- Left Column (5 cols): Task Entry -->
-      <div class="lg:col-span-5 space-y-5">
-        <div class="themed-card p-5">
-          <div class="flex items-center gap-2 mb-4">
-            <span class="text-lg">⚔️</span>
-            <h2 class="font-app-title font-bold text-base" style="color: var(--text-main);">LOG COMPLETED TASK</h2>
-          </div>
-
-          <form id="taskForm" class="space-y-4">
-            <div>
-              <label for="taskInput" class="block text-xs font-semibold uppercase tracking-wider mb-1.5" style="color: var(--text-muted);">
-                What did you accomplish?
-              </label>
-              <textarea 
-                id="taskInput" 
-                rows="3" 
-                required
-                placeholder="e.g. Completed Math lesson, Done HW, Read 30 mins, 50 pushups, Solved 3 algorithm problems..."
-                class="w-full themed-btn border p-3 text-sm focus:outline-none transition resize-none"
-                style="background: var(--bg-subtle); border-color: var(--border-color); color: var(--text-main);"></textarea>
-            </div>
-
-            <!-- Effort / Difficulty selector -->
-            <div>
-              <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5" style="color: var(--text-muted);">
-                Task Effort / Difficulty Tier
-              </label>
-              <div class="grid grid-cols-4 gap-2">
-                <button type="button" data-tier="light" class="tier-btn py-2 px-1 themed-btn border text-center transition flex flex-col items-center" style="background: var(--bg-subtle); border-color: var(--border-color);">
-                  <span class="text-xs font-bold" style="color: var(--secondary);">Quick</span>
-                  <span class="text-[10px]" style="color: var(--text-muted);">+15 XP</span>
-                </button>
-                <button type="button" data-tier="medium" class="tier-btn active-tier py-2 px-1 themed-btn border text-center transition flex flex-col items-center" style="background: var(--primary-glow); border-color: var(--primary);">
-                  <span class="text-xs font-bold" style="color: var(--primary);">Standard</span>
-                  <span class="text-[10px]" style="color: var(--text-main);">+35 XP</span>
-                </button>
-                <button type="button" data-tier="hard" class="tier-btn py-2 px-1 themed-btn border text-center transition flex flex-col items-center" style="background: var(--bg-subtle); border-color: var(--border-color);">
-                  <span class="text-xs font-bold text-amber-400">Hard</span>
-                  <span class="text-[10px]" style="color: var(--text-muted);">+60 XP</span>
-                </button>
-                <button type="button" data-tier="epic" class="tier-btn py-2 px-1 themed-btn border text-center transition flex flex-col items-center" style="background: var(--bg-subtle); border-color: var(--border-color);">
-                  <span class="text-xs font-bold" style="color: var(--accent);">Epic</span>
-                  <span class="text-[10px]" style="color: var(--text-muted);">+100 XP</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Custom XP override -->
-            <div class="pt-1">
-              <div class="flex items-center justify-between text-xs" style="color: var(--text-muted);">
-                <label class="flex items-center gap-2 cursor-pointer select-none">
-                  <input type="checkbox" id="customXpToggle" class="rounded border text-purple-600 focus:ring-0" style="background: var(--bg-subtle); border-color: var(--border-color);">
-                  <span>Custom XP modifier</span>
-                </label>
-                <div id="customXpInputContainer" class="hidden flex items-center gap-1.5">
-                  <input type="number" id="customXpInput" min="5" max="300" placeholder="50" class="w-16 border rounded-lg px-2 py-0.5 text-xs text-right font-mono focus:outline-none" style="background: var(--bg-subtle); border-color: var(--border-color); color: var(--secondary);">
-                  <span class="text-[11px]" style="color: var(--text-muted);">XP</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Submit Button -->
-            <button 
-              type="submit" 
-              id="submitTaskBtn"
-              class="w-full py-3.5 px-4 dynamic-primary-gradient themed-btn font-app-title font-bold text-white text-sm tracking-wider uppercase shadow-lg active:scale-[0.99] transition flex items-center justify-center gap-2">
-              <span>Claim XP & Log Quest</span>
-              <span id="earnedPreviewTag" class="text-xs font-mono font-normal px-2 py-0.5 rounded-full border border-white/30 bg-black/30 text-white">+35 XP</span>
-            </button>
-          </form>
-
-          <!-- Quick shortcuts -->
-          <div class="mt-4 pt-4 border-t" style="border-color: var(--border-color);">
-            <span class="text-[11px] font-semibold uppercase tracking-wider block mb-2" style="color: var(--text-muted);">Quick Shortcuts:</span>
-            <div class="flex flex-wrap gap-1.5">
-              <button class="quick-preset text-[11px] px-2.5 py-1 themed-btn border transition hover:brightness-125" style="background: var(--bg-subtle); border-color: var(--border-color); color: var(--text-muted);">
-                📚 1hr Study / Lesson (+35 XP)
-              </button>
-              <button class="quick-preset text-[11px] px-2.5 py-1 themed-btn border transition hover:brightness-125" style="background: var(--bg-subtle); border-color: var(--border-color); color: var(--text-muted);">
-                📝 Finished Homework (+60 XP)
-              </button>
-              <button class="quick-preset text-[11px] px-2.5 py-1 themed-btn border transition hover:brightness-125" style="background: var(--bg-subtle); border-color: var(--border-color); color: var(--text-muted);">
-                🏃 Workout / Exercise (+35 XP)
-              </button>
-              <button class="quick-preset text-[11px] px-2.5 py-1 themed-btn border transition hover:brightness-125" style="background: var(--bg-subtle); border-color: var(--border-color); color: var(--text-muted);">
-                💧 Habit / Quick chore (+15 XP)
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Rules & Info Card -->
-        <div class="themed-card p-4 text-xs space-y-3" style="color: var(--text-muted);">
-          <div class="font-app-title font-bold flex items-center justify-between" style="color: var(--text-main);">
-            <span class="flex items-center gap-1.5">⚙️ Game Rules & Daily Caps</span>
-            <span class="text-[10px] uppercase tracking-wider" style="color: var(--secondary);">Parameters</span>
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div class="p-2.5 themed-btn border" style="background: var(--bg-subtle); border-color: var(--border-color);">
-              <span class="block text-[10px] uppercase font-bold" style="color: var(--text-muted);">Max Level Cap</span>
-              <span class="text-sm font-bold font-app-title" style="color: var(--text-main);">Level 100</span>
-            </div>
-            <div class="p-2.5 themed-btn border" style="background: var(--bg-subtle); border-color: var(--border-color);">
-              <span class="block text-[10px] uppercase font-bold" style="color: var(--text-muted);">Daily Limit Cap</span>
-              <span class="text-sm font-bold font-app-title" style="color: var(--secondary);">500 XP / day</span>
-            </div>
-          </div>
-
-          <p class="text-[11px] leading-relaxed">
-            * Consistent daily log preserves your multiplier. Inactivity for over 24 hours drops your streak to 0 and cuts 50 XP (safeguarded so you never drop below Lv 1).
-          </p>
-        </div>
-      </div>
-
-      <!-- Right Column (7 cols): Task History Feed -->
-      <div class="lg:col-span-7 space-y-5">
-        <div class="themed-card p-5 flex flex-col h-[560px]">
-          <div class="flex items-center justify-between pb-3 border-b" style="border-color: var(--border-color);">
-            <div class="flex items-center gap-2">
-              <span class="text-lg">📜</span>
-              <h2 class="font-app-title font-bold text-base" style="color: var(--text-main);">GRIND LOG & HISTORY</h2>
-              <span id="taskCountBadge" class="ml-1 text-[10px] font-mono px-2 py-0.5 rounded-full border" style="background: var(--primary-glow); border-color: var(--primary); color: var(--text-main);">0 entries</span>
-            </div>
-
-            <button id="clearHistoryBtn" class="text-xs transition underline hover:text-rose-400" style="color: var(--text-muted);">
-              Clear Logs
-            </button>
-          </div>
-
-          <!-- Task Scrollable Container -->
-          <div id="taskList" class="flex-1 overflow-y-auto divide-y pr-1 mt-2 space-y-1 custom-scroll" style="border-color: var(--border-color);">
-            <div id="emptyTaskState" class="h-full flex flex-col items-center justify-center text-center p-8" style="color: var(--text-muted);">
-              <span class="text-4xl mb-3 opacity-60">🛡️</span>
-              <p class="text-sm font-semibold" style="color: var(--text-main);">No grinding recorded yet today.</p>
-              <p class="text-xs max-w-xs mt-1">Type any task you just finished on the left and hit 'Claim XP' to start gaining levels!</p>
-            </div>
-          </div>
-
-          <!-- Footer stats summary -->
-          <div class="pt-3 border-t flex items-center justify-between text-xs" style="border-color: var(--border-color); color: var(--text-muted);">
-            <span>Completed Quests Today: <strong id="todayCompletedCount" style="color: var(--text-main);">0</strong></span>
-            <span class="text-[11px]">Auto-saved to browser storage</span>
-          </div>
-        </div>
-      </div>
-
-    </section>
-
-  </main>
-
-  <!-- THEME & COLOR PALETTE CUSTOMIZER MODAL -->
-  <div id="themeModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-    <div class="themed-card max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto custom-scroll border shadow-2xl relative" style="border-color: var(--primary);">
-      
-      <div class="flex items-center justify-between pb-3 border-b mb-5" style="border-color: var(--border-color);">
-        <div class="flex items-center gap-2">
-          <span class="text-2xl">🎨</span>
-          <div>
-            <h2 class="text-lg font-bold font-app-title" style="color: var(--text-main);">INTERFACE TEMPLATES & PALETTES</h2>
-            <p class="text-xs" style="color: var(--text-muted);">Choose your layout vibe and aesthetic color system</p>
-          </div>
-        </div>
-        <button id="themeModalCloseBtn" class="text-slate-400 hover:text-white text-lg font-bold p-1">✕</button>
-      </div>
-
-      <!-- SECTION 1: UI LAYOUT TEMPLATES -->
-      <div class="space-y-3 mb-6">
-        <div class="flex items-center justify-between">
-          <h3 class="text-xs font-bold uppercase tracking-wider font-app-title" style="color: var(--secondary);">1. Choose UI Template & Aesthetic</h3>
-          <span class="text-[10px] text-slate-400">Controls layout structure, corners, fonts & cards</span>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="templatePickerContainer">
+      <!-- Row 2: Built-in Avatar Operative Chooser (No upload needed) -->
+      <div class="controls-grid" style="border-bottom: none; padding-bottom: 0;">
+        <div class="avatar-selector">
+          <span class="control-label">operative avatar:</span>
           
-          <!-- Template A: Cyber Hunter / Sci-Fi HUD -->
-          <div data-tpl="cyber" class="template-card cursor-pointer p-3.5 rounded-xl border transition hover:scale-[1.02] flex flex-col justify-between" style="background: #11151c; border-color: #3b82f6;">
-            <div class="flex items-start justify-between">
-              <div>
-                <span class="text-xs font-bold font-['Chakra_Petch'] text-cyan-400">Cyber Hunter HUD</span>
-                <p class="text-[11px] text-slate-400 mt-0.5">Sci-Fi holographic gaming terminal with glowing borders</p>
-              </div>
-              <span class="check-icon text-cyan-400 text-sm font-bold">✓</span>
-            </div>
-            <div class="mt-3 flex gap-1.5 items-center">
-              <span class="h-2 w-8 bg-cyan-400 rounded-sm"></span>
-              <span class="h-2 w-14 bg-purple-500 rounded-sm"></span>
-              <span class="text-[10px] text-slate-500 font-mono">Chakra Font</span>
-            </div>
-          </div>
+          <!-- Avatar 1: Shadow Coder -->
+          <button class="avatar-btn selected" data-avatar="coder" onclick="selectAvatar('coder')" title="shadow coder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 18l6-6-6-6M8 6l-6 6 6 6"></path>
+            </svg>
+          </button>
 
-          <!-- Template B: Dark Minimal RPG -->
-          <div data-tpl="minimal" class="template-card cursor-pointer p-3.5 rounded-xl border border-slate-700 bg-slate-900/80 transition hover:scale-[1.02] flex flex-col justify-between">
-            <div class="flex items-start justify-between">
-              <div>
-                <span class="text-xs font-bold font-sans text-slate-200">Dark Minimal RPG</span>
-                <p class="text-[11px] text-slate-400 mt-0.5">Clean obsidian dashboard, flat borders, high focus contrast</p>
-              </div>
-              <span class="check-icon text-slate-400 text-sm font-bold opacity-0">✓</span>
-            </div>
-            <div class="mt-3 flex gap-1.5 items-center">
-              <span class="h-2 w-6 bg-slate-400 rounded-sm"></span>
-              <span class="h-2 w-10 bg-slate-600 rounded-sm"></span>
-              <span class="text-[10px] text-slate-500 font-mono">Flat Minimal</span>
-            </div>
-          </div>
+          <!-- Avatar 2: Neon Rogue -->
+          <button class="avatar-btn" data-avatar="rogue" onclick="selectAvatar('rogue')" title="cyber rogue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2l3 5h6l-5 4 2 6-6-4-6 4 2-6-5-4h6z"></path>
+            </svg>
+          </button>
 
-          <!-- Template C: Retro Arcade Pixel 80s -->
-          <div data-tpl="retro" class="template-card cursor-pointer p-3.5 rounded-none border-2 border-amber-500 bg-black transition hover:scale-[1.02] flex flex-col justify-between">
-            <div class="flex items-start justify-between">
-              <div>
-                <span class="text-[11px] font-bold font-['Press_Start_2P'] text-amber-400 leading-relaxed">80s Retro Pixel</span>
-                <p class="text-[10px] text-slate-400 mt-1">Nostalgic arcade CRT vibe, blocky edges, 8-bit styling</p>
-              </div>
-              <span class="check-icon text-amber-400 text-sm font-bold opacity-0">✓</span>
-            </div>
-            <div class="mt-3 flex gap-1.5 items-center">
-              <span class="h-2 w-6 bg-amber-400"></span>
-              <span class="h-2 w-10 bg-rose-500"></span>
-              <span class="text-[9px] text-amber-300 font-mono">Arcade Font</span>
-            </div>
-          </div>
+          <!-- Avatar 3: Core Sentinel -->
+          <button class="avatar-btn" data-avatar="sentinel" onclick="selectAvatar('sentinel')" title="core sentinel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </button>
 
-          <!-- Template D: Clean Neumorphic Glass -->
-          <div data-tpl="glass" class="template-card cursor-pointer p-3.5 rounded-2xl border border-white/20 bg-slate-800/50 backdrop-blur-md transition hover:scale-[1.02] flex flex-col justify-between">
-            <div class="flex items-start justify-between">
-              <div>
-                <span class="text-xs font-bold font-['Outfit'] text-white">Neumorphic Glass</span>
-                <p class="text-[11px] text-slate-400 mt-0.5">Frosted glassmorphism, soft glow, premium modern aesthetic</p>
-              </div>
-              <span class="check-icon text-white text-sm font-bold opacity-0">✓</span>
-            </div>
-            <div class="mt-3 flex gap-1.5 items-center">
-              <span class="h-2 w-12 bg-white/40 rounded-full"></span>
-              <span class="h-2 w-6 bg-purple-400/60 rounded-full"></span>
-              <span class="text-[10px] text-slate-300 font-mono">Glass Blur</span>
-            </div>
-          </div>
+          <!-- Avatar 4: Cyber Ronin -->
+          <button class="avatar-btn" data-avatar="ronin" onclick="selectAvatar('ronin')" title="cyber ronin">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+          </button>
 
+          <!-- Avatar 5: Pixel Monarch -->
+          <button class="avatar-btn" data-avatar="monarch" onclick="selectAvatar('monarch')" title="pixel monarch">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 16V9l4 3 3-5 3 5 4-3v7z"></path>
+              <path d="M3 18h18v2H3z"></path>
+            </svg>
+          </button>
         </div>
+
+        <span class="control-label" id="operativeName">operative: shadow coder</span>
+      </div>
+    </div>
+
+    <!-- CARD 2: REAL CHARACTER STATUS HUD -->
+    <div class="card status-hud">
+      <div class="current-avatar-preview" id="currentAvatarSlot">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 18l6-6-6-6M8 6l-6 6 6 6"></path>
+        </svg>
       </div>
 
-      <!-- SECTION 2: COLOR PALETTES -->
-      <div class="space-y-3">
-        <div class="flex items-center justify-between">
-          <h3 class="text-xs font-bold uppercase tracking-wider font-app-title" style="color: var(--secondary);">2. Choose Color Palette / Theme</h3>
-          <span class="text-[10px] text-slate-400">Dynamic colors applied across all HUD elements</span>
+      <div class="hud-main">
+        <div class="hud-header">
+          <div style="display: flex; align-items: baseline;">
+            <div class="level-badge" id="lvlDisplay">lvl 1</div>
+            <div class="rank-title" id="rankDisplay">novice grind initiate</div>
+          </div>
+          <div class="xp-counter-text">
+            <span id="currentXpText">0</span> / <span id="targetXpText">100</span> xp
+          </div>
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="palettePickerContainer">
-          
-          <!-- Palette 1: Cyberpunk Violet & Cyan -->
-          <button data-pal="cyberpunk" class="palette-card p-3 rounded-xl border text-left transition hover:scale-105 active:scale-95 flex flex-col gap-2" style="background: #11151c; border-color: #8b5cf6;">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-white font-app-title">Cyberpunk</span>
-              <span class="pal-check text-purple-400 text-xs">●</span>
-            </div>
-            <div class="flex gap-1.5">
-              <span class="w-4 h-4 rounded-full bg-[#8b5cf6] shadow"></span>
-              <span class="w-4 h-4 rounded-full bg-[#06b6d4] shadow"></span>
-              <span class="w-4 h-4 rounded-full bg-[#ec4899] shadow"></span>
-            </div>
-            <span class="text-[10px] text-slate-400">Violet & Cyan</span>
-          </button>
+        <!-- xp progress bar -->
+        <div class="bar-track">
+          <div class="bar-fill" id="xpBarFill"></div>
+        </div>
 
-          <!-- Palette 2: Emerald Matrix / Terminal Green -->
-          <button data-pal="matrix" class="palette-card p-3 rounded-xl border border-slate-700 text-left transition hover:scale-105 active:scale-95 flex flex-col gap-2" style="background: #08110b;">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-white font-app-title">Emerald Matrix</span>
-              <span class="pal-check text-emerald-400 text-xs opacity-0">●</span>
-            </div>
-            <div class="flex gap-1.5">
-              <span class="w-4 h-4 rounded-full bg-[#10b981] shadow"></span>
-              <span class="w-4 h-4 rounded-full bg-[#059669] shadow"></span>
-              <span class="w-4 h-4 rounded-full bg-[#34d399] shadow"></span>
-            </div>
-            <span class="text-[10px] text-slate-400">Terminal Green</span>
-          </button>
-
-          <!-- Palette 3: Solar Flare / Gold & Ember -->
-          <button data-pal="solar" class="palette-card p-3 rounded-xl border border-slate-700 text-left transition hover:scale-105 active:scale-95 flex flex-col gap-2" style="background: #140d05;">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-white font-app-title">Solar Flare</span>
-              <span class="pal-check text-amber-400 text-xs opacity-0">●</span>
-            </div>
-            <div class="flex gap-1.5">
-              <span class="w-4 h-4 rounded-full bg-[#f59e0b] shadow"></span>
-              <span class="w-4 h-4 rounded-full bg-[#f97316] shadow"></span>
-              <span class="w-4 h-4 rounded-full bg-[#fbbf24] shadow"></span>
-            </div>
-            <span class="text-[10px] text-slate-400">Gold & Ember</span>
-          </button>
-
-          <!-- Palette 4: Blood Moon / Crimson Fury -->
-          <button data-pal="bloodmoon" class="palette-card p-3 rounded-xl border border-slate-700 text-left transition hover:scale-105 active:scale-95 flex flex-col gap-2" style="background: #17070a;">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-white font-app-title">Blood Moon</span>
-              <span class="pal-check text-rose-500 text-xs opacity-0">●</span>
-            </div>
-            <div class="flex gap-1.5">
-              <span class="w-4 h-4 rounded-full bg-[#f43f5e] shadow"></span>
-              <span class="w-4 h-4 rounded-full bg-[#e11d48] shadow"></span>
-              <span class="w-4 h-4 rounded-full bg-[#fda4af] shadow"></span>
-            </div>
-            <span class="text-[10px] text-slate-400">Crimson Fury</span>
-          </button>
-
-          <!-- Palette 5: Obsidian Monochrome -->
-          <button data-pal="obsidian" class="palette-card p-3 rounded-xl border border-slate-700 text-left transition hover:scale-105 active:scale-95 flex flex-col gap-2" style="background: #09090b;">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-white font-app-title">Obsidian Mono</span>
-              <span class="pal-check text-slate-200 text-xs opacity-0">●</span>
-            </div>
-            <div class="flex gap-1.5">
-              <span class="w-4 h-4 rounded-full bg-[#e2e8f0] shadow"></span>
-              <span class="w-4 h-4 rounded-full bg-[#64748b] shadow"></span>
-              <span class="w-4 h-4 rounded-full bg-[#334155] shadow"></span>
-            </div>
-            <span class="text-[10px] text-slate-400">Steel & Monochrome</span>
-          </button>
-
-          <!-- Palette 6: Royal Amethyst -->
-          <button data-pal="amethyst" class="palette-card p-3 rounded-xl border border-slate-700 text-left transition hover:scale-105 active:scale-95 flex flex-col gap-2" style="background: #11091e;">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-white font-app-title">Royal Amethyst</span>
-              <span class="pal-check text-indigo-400 text-xs opacity-0">●</span>
-            </div>
-            <div class="flex gap-1.5">
-              <span class="w-4 h-4 rounded-full bg-[#a855f7] shadow"></span>
-              <span class="w-4 h-4 rounded-full bg-[#6366f1] shadow"></span>
-              <span class="w-4 h-4 rounded-full bg-[#c084fc] shadow"></span>
-            </div>
-            <span class="text-[10px] text-slate-400">Deep Purple & Indigo</span>
-          </button>
-
+        <div class="hud-footer-metrics">
+          <div class="metric-pill">
+            🔥 streak: <strong id="streakDisplay">0 days</strong>
+          </div>
+          <div class="metric-pill">
+            ⚡ today: <strong id="todayXpDisplay">0 / 500 xp</strong>
+          </div>
+          <div class="metric-pill">
+            🏆 total earned: <strong id="totalXpDisplay">0 xp</strong>
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- Action Footer -->
-      <div class="mt-6 pt-4 border-t flex justify-end" style="border-color: var(--border-color);">
-        <button id="applyThemeBtn" class="themed-btn px-6 py-2.5 dynamic-primary-gradient font-app-title font-bold text-white text-xs tracking-wider uppercase shadow-lg transition hover:brightness-110">
-          Apply & Return to Grind
+    <!-- CARD 3: QUEST LOG ENTRY (ACTION HUB) -->
+    <div class="card entry-card">
+      <div class="input-row">
+        <input 
+          type="text" 
+          id="taskInput" 
+          class="task-input" 
+          placeholder="what did you complete? (e.g. finished math hw, 1hr coding...)" 
+          autocomplete="off"
+          onkeydown="if(event.key === 'Enter') submitTask()"
+        >
+        <button class="submit-btn" onclick="submitTask()">
+          <span>log quest</span> ↵
         </button>
       </div>
 
-    </div>
-  </div>
+      <!-- quick tiers & quick tags in direct sight -->
+      <div class="options-row">
+        <div class="control-group">
+          <span class="control-label">xp tier:</span>
+          <button class="pill-btn active tier-pill" data-xp="15" onclick="selectTier(15, this)">quick (+15)</button>
+          <button class="pill-btn tier-pill" data-xp="35" onclick="selectTier(35, this)">standard (+35)</button>
+          <button class="pill-btn tier-pill" data-xp="60" onclick="selectTier(60, this)">hard (+60)</button>
+          <button class="pill-btn tier-pill" data-xp="100" onclick="selectTier(100, this)">epic (+100)</button>
+          <input type="number" id="customXp" class="custom-xp-input" placeholder="custom" min="1" max="250" oninput="onCustomXpInput(this)">
+        </div>
 
-  <!-- Level Up Modal Overlay -->
-  <div id="levelUpModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-    <div class="themed-card border-2 max-w-sm w-full p-6 text-center shadow-2xl transition-all" style="border-color: var(--primary);">
-      <div class="w-20 h-20 mx-auto mb-4 themed-btn dynamic-primary-gradient flex items-center justify-center text-4xl shadow-lg">
-        🎉
+        <div class="tags-container">
+          <span class="control-label">tag:</span>
+          <span class="tag-chip" onclick="appendTag('#lesson')">#lesson</span>
+          <span class="tag-chip" onclick="appendTag('#hw')">#hw</span>
+          <span class="tag-chip" onclick="appendTag('#study')">#study</span>
+          <span class="tag-chip" onclick="appendTag('#code')">#code</span>
+          <span class="tag-chip" onclick="appendTag('#workout')">#workout</span>
+        </div>
       </div>
-      <h3 class="text-xs font-bold tracking-widest uppercase font-app-title" style="color: var(--secondary);">Breakthrough Achieved</h3>
-      <h2 class="text-3xl font-extrabold font-app-title mt-1" style="color: var(--text-main);">LEVEL UP!</h2>
-      <p class="text-lg font-bold mt-1" style="color: var(--primary);">You reached Level <span id="modalLevelNumber">2</span></p>
-      
-      <div id="newRankNotice" class="hidden mt-3 p-2 themed-btn border text-xs" style="background: var(--primary-glow); border-color: var(--primary); color: var(--text-main);">
-        🌟 <strong>New Hunter Title:</strong> <span id="modalNewRankTitle">Apprentice</span>
+    </div>
+
+    <!-- CARD 4: THE LOG BOOK -->
+    <div class="card">
+      <div class="log-header">
+        <div class="log-title">
+          <span>📖 grind log book</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;" id="logCountText">(0 entries)</span>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <input type="text" id="searchLog" class="log-search" placeholder="search entries..." oninput="renderLog()">
+          <button class="pill-btn" onclick="copyLogToClipboard()">📋 copy</button>
+        </div>
       </div>
 
-      <p class="text-xs mt-4" style="color: var(--text-muted);">Keep grinding to build your daily streak and unlock higher ranks.</p>
+      <div class="log-filters">
+        <button class="pill-btn active log-filter-btn" data-filter="all" onclick="setLogFilter('all', this)">all</button>
+        <button class="pill-btn log-filter-btn" data-filter="today" onclick="setLogFilter('today', this)">today</button>
+        <button class="pill-btn log-filter-btn" data-filter="penalties" onclick="setLogFilter('penalties', this)">penalties</button>
+        <button class="pill-btn log-filter-btn" data-filter="high" onclick="setLogFilter('high', this)">high xp (60+)</button>
+      </div>
 
-      <button id="closeLevelUpBtn" class="mt-6 w-full py-3 themed-btn dynamic-primary-gradient font-app-title font-bold text-white text-sm shadow-lg hover:brightness-110 active:scale-95 transition">
-        CLAIM POWER & CONTINUE
-      </button>
+      <div class="log-feed" id="logFeed">
+        <!-- populated dynamically -->
+      </div>
     </div>
+
   </div>
 
-  <!-- Notification Toast -->
-  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-xs font-semibold border" style="background: var(--bg-card); border-color: var(--secondary); color: var(--text-main);">
-    <span id="toastIcon">✨</span>
-    <span id="toastText">Logged task!</span>
-  </div>
-
-  <!-- Game & Customizer Logic -->
   <script>
-    /* ============================================================
-     * THEMES & COLOR PALETTES DEFINITIONS
-     * ============================================================ */
-    const UI_TEMPLATES = {
-      cyber: {
-        id: 'cyber',
-        name: 'Cyber Hunter HUD',
-        badge: 'Sci-Fi HUD',
-        bodyClass: 'cyber',
-        fontTitle: "'Chakra Petch', sans-serif",
-        fontBody: "'Inter', sans-serif",
-        soundStyle: 'synth'
-      },
-      minimal: {
-        id: 'minimal',
-        name: 'Dark Minimal RPG',
-        badge: 'Minimal RPG',
-        bodyClass: 'minimal',
-        fontTitle: "'Outfit', sans-serif",
-        fontBody: "'Inter', sans-serif",
-        soundStyle: 'clean'
-      },
-      retro: {
-        id: 'retro',
-        name: '80s Retro Pixel',
-        badge: '80s Arcade',
-        bodyClass: 'retro',
-        fontTitle: "'Press Start 2P', monospace",
-        fontBody: "'Chakra Petch', sans-serif",
-        soundStyle: 'chiptune'
-      },
-      glass: {
-        id: 'glass',
-        name: 'Neumorphic Glass',
-        badge: 'Neumorphic Glass',
-        bodyClass: 'glass',
-        fontTitle: "'Outfit', sans-serif",
-        fontBody: "'Outfit', sans-serif",
-        soundStyle: 'soft'
-      }
-    };
+    /* -------------------------------------------------------------
+       STATE MANAGEMENT & INITIALIZATION (CLEAN NO RANDOM PROGRESS)
+    -------------------------------------------------------------- */
+    const DAILY_CAP = 500;
+    const MAX_LEVEL = 100;
 
-    const COLOR_PALETTES = {
-      cyberpunk: {
-        id: 'cyberpunk',
-        name: 'Neon Cyberpunk',
-        vars: {
-          '--bg-main': '#0b0e14',
-          '--bg-header': 'rgba(17, 21, 28, 0.85)',
-          '--bg-card': '#161b22',
-          '--bg-subtle': '#0d1117',
-          '--border-color': 'rgba(48, 54, 61, 0.85)',
-          '--primary': '#8b5cf6',
-          '--primary-glow': 'rgba(139, 92, 246, 0.35)',
-          '--secondary': '#06b6d4',
-          '--secondary-glow': 'rgba(6, 182, 212, 0.35)',
-          '--accent': '#ec4899',
-          '--text-main': '#f1f5f9',
-          '--text-muted': '#94a3b8'
-        }
-      },
-      matrix: {
-        id: 'matrix',
-        name: 'Emerald Matrix',
-        vars: {
-          '--bg-main': '#050c07',
-          '--bg-header': 'rgba(8, 17, 11, 0.9)',
-          '--bg-card': '#0c1a11',
-          '--bg-subtle': '#07120a',
-          '--border-color': 'rgba(16, 185, 129, 0.3)',
-          '--primary': '#10b981',
-          '--primary-glow': 'rgba(16, 185, 129, 0.35)',
-          '--secondary': '#34d399',
-          '--secondary-glow': 'rgba(52, 211, 153, 0.35)',
-          '--accent': '#6ee7b7',
-          '--text-main': '#ecfdf5',
-          '--text-muted': '#6ee7b7'
-        }
-      },
-      solar: {
-        id: 'solar',
-        name: 'Solar Flare',
-        vars: {
-          '--bg-main': '#0e0903',
-          '--bg-header': 'rgba(20, 13, 5, 0.9)',
-          '--bg-card': '#1f1308',
-          '--bg-subtle': '#120b04',
-          '--border-color': 'rgba(245, 158, 11, 0.3)',
-          '--primary': '#f59e0b',
-          '--primary-glow': 'rgba(245, 158, 11, 0.35)',
-          '--secondary': '#f97316',
-          '--secondary-glow': 'rgba(249, 115, 22, 0.35)',
-          '--accent': '#fbbf24',
-          '--text-main': '#fffbeb',
-          '--text-muted': '#d97706'
-        }
-      },
-      bloodmoon: {
-        id: 'bloodmoon',
-        name: 'Blood Moon',
-        vars: {
-          '--bg-main': '#0e0407',
-          '--bg-header': 'rgba(23, 7, 10, 0.9)',
-          '--bg-card': '#1f0910',
-          '--bg-subtle': '#14050a',
-          '--border-color': 'rgba(244, 63, 94, 0.3)',
-          '--primary': '#f43f5e',
-          '--primary-glow': 'rgba(244, 63, 94, 0.35)',
-          '--secondary': '#fb7185',
-          '--secondary-glow': 'rgba(251, 113, 133, 0.35)',
-          '--accent': '#e11d48',
-          '--text-main': '#fff1f2',
-          '--text-muted': '#f43f5e'
-        }
-      },
-      obsidian: {
-        id: 'obsidian',
-        name: 'Obsidian Monochrome',
-        vars: {
-          '--bg-main': '#09090b',
-          '--bg-header': 'rgba(18, 18, 22, 0.92)',
-          '--bg-card': '#18181b',
-          '--bg-subtle': '#0d0d10',
-          '--border-color': 'rgba(82, 82, 91, 0.4)',
-          '--primary': '#e2e8f0',
-          '--primary-glow': 'rgba(226, 232, 240, 0.25)',
-          '--secondary': '#94a3b8',
-          '--secondary-glow': 'rgba(148, 163, 184, 0.25)',
-          '--accent': '#cbd5e1',
-          '--text-main': '#fafafa',
-          '--text-muted': '#a1a1aa'
-        }
-      },
-      amethyst: {
-        id: 'amethyst',
-        name: 'Royal Amethyst',
-        vars: {
-          '--bg-main': '#0b0614',
-          '--bg-header': 'rgba(17, 9, 30, 0.9)',
-          '--bg-card': '#170c2a',
-          '--bg-subtle': '#100720',
-          '--border-color': 'rgba(168, 85, 247, 0.3)',
-          '--primary': '#a855f7',
-          '--primary-glow': 'rgba(168, 85, 247, 0.35)',
-          '--secondary': '#6366f1',
-          '--secondary-glow': 'rgba(99, 102, 241, 0.35)',
-          '--accent': '#c084fc',
-          '--text-main': '#faf5ff',
-          '--text-muted': '#c084fc'
-        }
-      }
-    };
-
-    /* ============================================================
-     * GAME CONFIGURATION & CONSTANTS
-     * ============================================================ */
-    const CONFIG = {
-      MAX_LEVEL: 100,
-      BASE_XP_PER_LEVEL: 100,
-      SCALING_FACTOR: 1.15,
-      DAILY_XP_CAP: 500,
-      MISSED_DAY_PENALTY_XP: 50,
-      TIERS: {
-        light: { name: 'Quick', xp: 15 },
-        medium: { name: 'Standard', xp: 35 },
-        hard: { name: 'Hard', xp: 60 },
-        epic: { name: 'Epic', xp: 100 }
-      },
-      RANKS: [
-        { minLevel: 1, title: 'E-Rank Novice', badge: 'Novice', icon: '🗡️' },
-        { minLevel: 5, title: 'D-Rank Apprentice', badge: 'Apprentice', icon: '🏹' },
-        { minLevel: 12, title: 'C-Rank Grinder', badge: 'Grinder', icon: '🛡️' },
-        { minLevel: 25, title: 'B-Rank Veteran', badge: 'Veteran', icon: '⚔️' },
-        { minLevel: 45, title: 'A-Rank Master', badge: 'Master', icon: '🔮' },
-        { minLevel: 75, title: 'S-Rank Grandmaster', badge: 'Grandmaster', icon: '👑' },
-        { minLevel: 100, title: 'Monarch of Tasks', badge: 'Ascended', icon: '⚡' }
-      ]
-    };
-
-    /* ============================================================
-     * APP STATE
-     * ============================================================ */
-    const STORAGE_KEY = 'daily_xp_grind_save_v2';
-
-    let gameState = {
+    // clean fresh default state
+    let state = {
       level: 1,
       currentXp: 0,
       totalXpEarned: 0,
-      streak: 0,
-      lastActiveDate: null,
       todayXp: 0,
-      todayDate: null,
-      tasks: [],
+      lastActiveDate: null,
+      streak: 0,
+      selectedTierXp: 15,
+      activePalette: 'theme-lime',
+      activeAvatar: 'coder',
       soundEnabled: true,
-      currentTemplate: 'cyber',
-      currentPalette: 'cyberpunk'
+      tasks: [] // starts completely empty: no dummy or random data
     };
 
-    let selectedTier = 'medium';
+    let activeFilter = 'all';
 
-    /* ============================================================
-     * PROCEDURAL AUDIO SYNTHESIZER WITH VIBE CUSTOMIZATION
-     * ============================================================ */
-    const SoundEngine = {
-      ctx: null,
-      
-      init() {
-        if (!this.ctx) {
-          const AudioContext = window.AudioContext || window.webkitAudioContext;
-          if (AudioContext) {
-            this.ctx = new AudioContext();
-          }
-        }
-        if (this.ctx && this.ctx.state === 'suspended') {
-          this.ctx.resume();
-        }
-      },
+    // SVG icon library for avatars
+    const AVATAR_SVGS = {
+      coder: `<svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"></path></svg>`,
+      rogue: `<svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 5h6l-5 4 2 6-6-4-6 4 2-6-5-4h6z"></path></svg>`,
+      sentinel: `<svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`,
+      ronin: `<svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`,
+      monarch: `<svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16V9l4 3 3-5 3 5 4-3v7z"></path><path d="M3 18h18v2H3z"></path></svg>`
+    };
 
-      playXpTick() {
-        if (!gameState.soundEnabled) return;
-        this.init();
-        if (!this.ctx) return;
+    const AVATAR_NAMES = {
+      coder: "shadow coder",
+      rogue: "cyber rogue",
+      sentinel: "core sentinel",
+      ronin: "cyber ronin",
+      monarch: "pixel monarch"
+    };
 
-        const style = UI_TEMPLATES[gameState.currentTemplate]?.soundStyle || 'synth';
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
+    // Calculate required XP for a given level
+    function xpRequiredForLevel(lvl) {
+      if (lvl >= MAX_LEVEL) return 999999;
+      return Math.floor(100 * Math.pow(lvl, 1.25));
+    }
 
-        if (style === 'chiptune') {
-          // Retro 8-bit sound
-          osc.type = 'square';
-          osc.frequency.setValueAtTime(350, now);
-          osc.frequency.setValueAtTime(700, now + 0.05);
-          gain.gain.setValueAtTime(0.12, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start(now);
-          osc.stop(now + 0.13);
-        } else {
-          // Modern / synth / smooth
-          osc.type = style === 'soft' ? 'sine' : 'triangle';
-          osc.frequency.setValueAtTime(523.25, now);
-          osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.12);
-          gain.gain.setValueAtTime(0.16, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start(now);
-          osc.stop(now + 0.15);
-        }
-      },
+    // Rank titles
+    function getRankTitle(lvl) {
+      if (lvl >= 80) return "monarch of eternity";
+      if (lvl >= 60) return "s-rank supreme";
+      if (lvl >= 40) return "a-rank elite operative";
+      if (lvl >= 25) return "b-rank specialist";
+      if (lvl >= 15) return "c-rank grinder";
+      if (lvl >= 5)  return "d-rank apprentice";
+      return "novice grind initiate";
+    }
 
-      playLevelUp() {
-        if (!gameState.soundEnabled) return;
-        this.init();
-        if (!this.ctx) return;
+    /* -------------------------------------------------------------
+       AUDIO SYNTHESIZER (NO EXTERNAL AUDIO FILES)
+    -------------------------------------------------------------- */
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      return audioCtx;
+    }
 
-        const isRetro = gameState.currentTemplate === 'retro';
-        const notes = isRetro ? [261.63, 329.63, 392.00, 523.25] : [440, 554.37, 659.25, 880];
-        
-        notes.forEach((freq, idx) => {
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          const time = this.ctx.currentTime + idx * 0.08;
+    function playSound(type) {
+      if (!state.soundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        if (ctx.state === 'suspended') ctx.resume();
 
-          osc.type = isRetro ? 'square' : 'triangle';
-          osc.frequency.setValueAtTime(freq, time);
-
-          gain.gain.setValueAtTime(0.18, time);
-          gain.gain.exponentialRampToValueAtTime(0.001, time + 0.32);
-
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start(time);
-          osc.stop(time + 0.33);
-        });
-      },
-
-      playPenaltyBuzz() {
-        if (!gameState.soundEnabled) return;
-        this.init();
-        if (!this.ctx) return;
-
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(160, now);
-        osc.frequency.exponentialRampToValueAtTime(75, now + 0.28);
-
-        gain.gain.setValueAtTime(0.22, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
         osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(now);
-        osc.stop(now + 0.32);
+        gain.connect(ctx.destination);
+
+        if (type === 'task') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+          osc.start(now);
+          osc.stop(now + 0.12);
+        } else if (type === 'levelup') {
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.1);
+          osc.frequency.setValueAtTime(783.99, now + 0.2);
+          osc.frequency.setValueAtTime(1046.50, now + 0.3);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+          osc.start(now);
+          osc.stop(now + 0.5);
+        } else if (type === 'penalty') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.exponentialRampToValueAtTime(110, now + 0.25);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        }
+      } catch (e) {
+        console.warn("audio error", e);
       }
-    };
-
-    /* ============================================================
-     * THEME & PALETTE APPLIER ENGINE
-     * ============================================================ */
-    function applyThemeAndPalette(templateKey, paletteKey) {
-      if (!UI_TEMPLATES[templateKey]) templateKey = 'cyber';
-      if (!COLOR_PALETTES[paletteKey]) paletteKey = 'cyberpunk';
-
-      gameState.currentTemplate = templateKey;
-      gameState.currentPalette = paletteKey;
-
-      const body = document.body;
-      body.setAttribute('data-template', templateKey);
-      body.setAttribute('data-palette', paletteKey);
-
-      // Apply CSS variables from palette
-      const paletteVars = COLOR_PALETTES[paletteKey].vars;
-      for (const [varName, varVal] of Object.entries(paletteVars)) {
-        document.documentElement.style.setProperty(varName, varVal);
-      }
-
-      // Update Header Badges
-      const tplObj = UI_TEMPLATES[templateKey];
-      const palObj = COLOR_PALETTES[paletteKey];
-      document.getElementById('activeLayoutBadge').innerText = tplObj.badge;
-      document.getElementById('activeColorBadge').innerText = palObj.name;
-
-      // Update Visual Checkmarks inside Customizer Modal
-      document.querySelectorAll('.template-card').forEach(card => {
-        const isMatch = card.dataset.tpl === templateKey;
-        const check = card.querySelector('.check-icon');
-        if (check) check.style.opacity = isMatch ? '1' : '0';
-        card.style.borderColor = isMatch ? 'var(--primary)' : 'var(--border-color)';
-      });
-
-      document.querySelectorAll('.palette-card').forEach(card => {
-        const isMatch = card.dataset.pal === paletteKey;
-        const check = card.querySelector('.pal-check');
-        if (check) check.style.opacity = isMatch ? '1' : '0';
-        card.style.borderColor = isMatch ? 'var(--primary)' : 'var(--border-color)';
-      });
-
-      saveGameState();
     }
 
-    /* ============================================================
-     * CORE GAME ENGINE (Level, Streak, Penalties)
-     * ============================================================ */
+    function toggleSound() {
+      state.soundEnabled = !state.soundEnabled;
+      document.getElementById('soundBtn').textContent = state.soundEnabled ? '🔊 sound: on' : '🔇 sound: off';
+      saveState();
+    }
+
+    /* -------------------------------------------------------------
+       DATE & STREAK AUDIT
+    -------------------------------------------------------------- */
     function getTodayString() {
-      return new Date().toISOString().split('T')[0];
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     }
 
-    function calculateXpRequiredForLevel(level) {
-      if (level >= CONFIG.MAX_LEVEL) return 0;
-      return Math.round((CONFIG.BASE_XP_PER_LEVEL * Math.pow(CONFIG.SCALING_FACTOR, level - 1)) / 10) * 10;
-    }
-
-    function getRankForLevel(level) {
-      let currentRank = CONFIG.RANKS[0];
-      for (const rank of CONFIG.RANKS) {
-        if (level >= rank.minLevel) currentRank = rank;
-      }
-      return currentRank;
-    }
-
-    function getNextRankRequirement(level) {
-      for (const rank of CONFIG.RANKS) {
-        if (rank.minLevel > level) return `Next rank (${rank.badge}) at Lv ${rank.minLevel}`;
-      }
-      return 'Maximum Rank Achieved!';
-    }
-
-    function showToast(message, icon = '✨') {
-      const toast = document.getElementById('toastNotification');
-      document.getElementById('toastText').innerText = message;
-      document.getElementById('toastIcon').innerText = icon;
-      toast.classList.remove('translate-y-24', 'opacity-0');
-      setTimeout(() => {
-        toast.classList.add('translate-y-24', 'opacity-0');
-      }, 2600);
-    }
-
-    function checkDateAndApplyPenalties() {
+    function auditStreakAndDay() {
       const today = getTodayString();
-      if (gameState.todayDate !== today) {
-        gameState.todayDate = today;
-        gameState.todayXp = 0;
+      if (!state.lastActiveDate) {
+        // brand new user: streak starts at 0, no penalties
+        return;
       }
 
-      if (!gameState.lastActiveDate) return;
+      if (state.lastActiveDate === today) {
+        // same day, nothing to reset
+        return;
+      }
 
-      const lastDate = new Date(gameState.lastActiveDate);
+      const lastDate = new Date(state.lastActiveDate);
       const currDate = new Date(today);
-      const diffTime = currDate - lastDate;
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      const diffDays = Math.floor((currDate - lastDate) / (1000 * 60 * 60 * 24));
 
-      if (diffDays > 1) {
-        applyMissedDayPenalty(diffDays - 1);
+      // Reset daily earned XP on a new calendar day
+      state.todayXp = 0;
+
+      if (diffDays === 1) {
+        // yesterday was active, streak holds
+      } else if (diffDays > 1) {
+        // missed one or more days! Apply penalty
+        const penaltyXp = 50;
+        state.streak = 0;
+        applyPenaltyXP(penaltyXp, `missed ${diffDays - 1} day(s) streak break`);
       }
     }
 
-    function applyMissedDayPenalty(missedCount) {
-      const totalPenaltyXp = missedCount * CONFIG.MISSED_DAY_PENALTY_XP;
-      const oldStreak = gameState.streak;
-
-      gameState.streak = 0;
-      
-      let remainingPenalty = totalPenaltyXp;
-      while (remainingPenalty > 0) {
-        if (gameState.currentXp >= remainingPenalty) {
-          gameState.currentXp -= remainingPenalty;
-          remainingPenalty = 0;
+    function applyPenaltyXP(amount, reason) {
+      state.currentXp -= amount;
+      if (state.currentXp < 0) {
+        if (state.level > 1) {
+          state.level -= 1;
+          const req = xpRequiredForLevel(state.level);
+          state.currentXp = Math.max(0, req + state.currentXp);
         } else {
-          remainingPenalty -= gameState.currentXp;
-          if (gameState.level > 1) {
-            gameState.level--;
-            gameState.currentXp = calculateXpRequiredForLevel(gameState.level);
-          } else {
-            gameState.currentXp = 0;
-            remainingPenalty = 0;
-          }
+          state.currentXp = 0;
         }
       }
 
-      saveGameState();
-      updateUI();
-      SoundEngine.playPenaltyBuzz();
+      // Log penalty as an entry
+      state.tasks.unshift({
+        id: 'penalty-' + Date.now(),
+        text: `penalty: ${reason.toLowerCase()}`,
+        xp: -amount,
+        isPenalty: true,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).toLowerCase(),
+        date: getTodayString()
+      });
 
-      const banner = document.getElementById('penaltyBanner');
-      const msg = document.getElementById('penaltyMessage');
-      msg.textContent = `You were inactive for ${missedCount} day(s). Streak broken (was ${oldStreak} days) and deducted ${totalPenaltyXp} XP!`;
-      banner.classList.remove('hidden');
+      playSound('penalty');
+      saveState();
+      renderUI();
     }
 
-    function logTask(taskTitle, xpValue) {
-      const today = getTodayString();
-      SoundEngine.init();
+    function simulateMissedDay() {
+      state.streak = 0;
+      applyPenaltyXP(50, "manual simulated missed day");
+      spawnFloatingToast("-50 xp penalty!", "#ef4444");
+    }
 
-      const availableCap = CONFIG.DAILY_XP_CAP - gameState.todayXp;
-      if (availableCap <= 0) {
-        showToast('Daily XP cap reached! Rest up to prevent burnout.', '🛑');
+    /* -------------------------------------------------------------
+       XP PROGRESSION & LEVEL LOGIC
+    -------------------------------------------------------------- */
+    function addXP(amount, taskName) {
+      if (state.level >= MAX_LEVEL) {
+        alert("maximum level 100 reached! you are at cap.");
         return;
       }
 
-      let finalXpGained = xpValue;
-      if (finalXpGained > availableCap) {
-        finalXpGained = availableCap;
-        showToast(`XP capped to +${finalXpGained} to respect daily limit!`, '⚠️');
-      }
-
-      if (gameState.lastActiveDate) {
-        const lastDate = new Date(gameState.lastActiveDate);
-        const currDate = new Date(today);
-        const diffDays = Math.floor((currDate - lastDate) / (1000 * 60 * 60 * 24));
-        if (diffDays === 1) {
-          gameState.streak += 1;
-        } else if (diffDays > 1) {
-          gameState.streak = 1;
-        }
-      } else {
-        gameState.streak = 1;
-      }
-
-      gameState.lastActiveDate = today;
-      gameState.todayDate = today;
-      gameState.todayXp += finalXpGained;
-      gameState.totalXpEarned += finalXpGained;
-
-      const taskEntry = {
-        id: Date.now(),
-        title: taskTitle.trim(),
-        xp: finalXpGained,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        date: today,
-        tier: selectedTier
-      };
-      gameState.tasks.unshift(taskEntry);
-
-      let leveledUp = false;
-      if (gameState.level < CONFIG.MAX_LEVEL) {
-        gameState.currentXp += finalXpGained;
-        let needed = calculateXpRequiredForLevel(gameState.level);
-
-        while (gameState.currentXp >= needed && gameState.level < CONFIG.MAX_LEVEL) {
-          gameState.currentXp -= needed;
-          gameState.level += 1;
-          leveledUp = true;
-          needed = calculateXpRequiredForLevel(gameState.level);
-        }
-
-        if (gameState.level >= CONFIG.MAX_LEVEL) {
-          gameState.currentXp = 0;
-        }
-      }
-
-      saveGameState();
-      updateUI();
-
-      if (leveledUp) {
-        triggerLevelUpCelebration(gameState.level);
-      } else {
-        SoundEngine.playXpTick();
-        showToast(`+${finalXpGained} XP Earned! Quest Logged.`, '⚡');
-      }
-    }
-
-    function triggerLevelUpCelebration(newLevel) {
-      SoundEngine.playLevelUp();
-
-      if (typeof confetti === 'function') {
-        confetti({
-          particleCount: 110,
-          spread: 80,
-          origin: { y: 0.6 }
-        });
-      }
-
-      const modal = document.getElementById('levelUpModal');
-      document.getElementById('modalLevelNumber').innerText = newLevel;
-
-      const rank = getRankForLevel(newLevel);
-      const prevRank = getRankForLevel(newLevel - 1);
-      const rankNotice = document.getElementById('newRankNotice');
-      
-      if (rank.badge !== prevRank.badge) {
-        document.getElementById('modalNewRankTitle').innerText = `${rank.badge} (${rank.title})`;
-        rankNotice.classList.remove('hidden');
-      } else {
-        rankNotice.classList.add('hidden');
-      }
-
-      modal.classList.remove('hidden');
-    }
-
-    /* ============================================================
-     * UI RENDERING
-     * ============================================================ */
-    function updateUI() {
-      document.getElementById('currentLevel').innerText = gameState.level;
-      document.getElementById('levelBadgeNumber').innerText = gameState.level;
-      document.getElementById('totalXpCounter').innerText = gameState.totalXpEarned.toLocaleString();
-
-      const xpNeeded = calculateXpRequiredForLevel(gameState.level);
-      const isMax = gameState.level >= CONFIG.MAX_LEVEL;
-      document.getElementById('maxLevelTag').classList.toggle('hidden', !isMax);
-
-      if (isMax) {
-        document.getElementById('currentXp').innerText = 'MAX';
-        document.getElementById('xpNeeded').innerText = 'MAX';
-        document.getElementById('levelProgressBar').style.width = '100%';
-        document.getElementById('xpPercentageText').innerText = 'Maximum Level Cap reached!';
-        document.getElementById('remainingXpToLevel').innerText = '0';
-      } else {
-        document.getElementById('currentXp').innerText = gameState.currentXp;
-        document.getElementById('xpNeeded').innerText = xpNeeded;
-        const percent = Math.min(100, Math.round((gameState.currentXp / xpNeeded) * 100));
-        document.getElementById('levelProgressBar').style.width = `${percent}%`;
-        document.getElementById('xpPercentageText').innerText = `${percent}% to Level ${gameState.level + 1}`;
-        document.getElementById('remainingXpToLevel').innerText = Math.max(0, xpNeeded - gameState.currentXp);
-      }
-
-      document.getElementById('dailyXpAccumulated').innerText = gameState.todayXp;
-      document.getElementById('dailyCapValue').innerText = CONFIG.DAILY_XP_CAP;
-      const dailyCapPercent = Math.min(100, Math.round((gameState.todayXp / CONFIG.DAILY_XP_CAP) * 100));
-      document.getElementById('dailyCapProgressBar').style.width = `${dailyCapPercent}%`;
-
-      const rank = getRankForLevel(gameState.level);
-      document.getElementById('rankBadge').innerText = rank.badge;
-      document.getElementById('rankIcon').innerText = rank.icon;
-      document.getElementById('rankTitle').innerText = rank.title;
-      document.getElementById('nextRankRequirement').innerText = getNextRankRequirement(gameState.level);
-
-      document.getElementById('streakCount').innerText = gameState.streak;
-      const streakStatus = document.getElementById('streakStatusText');
-      const isTodayActive = gameState.lastActiveDate === getTodayString();
-      if (isTodayActive) {
-        streakStatus.innerText = 'Streak safe for today! Great job.';
-        streakStatus.className = 'text-xs text-emerald-400 font-medium';
-      } else {
-        streakStatus.innerText = 'Log a task today to keep your streak alive!';
-        streakStatus.className = 'text-xs text-amber-300/90 font-medium';
-      }
-
-      document.getElementById('soundIcon').innerText = gameState.soundEnabled ? '🔊' : '🔇';
-      document.getElementById('soundStatusText').innerText = gameState.soundEnabled ? 'Audio' : 'Muted';
-
-      renderTaskFeed();
-    }
-
-    function renderTaskFeed() {
-      const container = document.getElementById('taskList');
-      const emptyState = document.getElementById('emptyTaskState');
-      const badgeCount = document.getElementById('taskCountBadge');
-      const todayCount = document.getElementById('todayCompletedCount');
-
-      badgeCount.innerText = `${gameState.tasks.length} entries`;
-
-      const today = getTodayString();
-      const todayTasks = gameState.tasks.filter(t => t.date === today);
-      todayCount.innerText = todayTasks.length;
-
-      if (gameState.tasks.length === 0) {
-        emptyState.classList.remove('hidden');
-        Array.from(container.children).forEach(child => {
-          if (child.id !== 'emptyTaskState') child.remove();
-        });
+      // check daily cap
+      const remainingToday = DAILY_CAP - state.todayXp;
+      if (remainingToday <= 0) {
+        alert("daily cap of 500 xp reached! rest up for tomorrow to prevent burnout.");
         return;
       }
 
-      emptyState.classList.add('hidden');
-      Array.from(container.children).forEach(child => {
-        if (child.id !== 'emptyTaskState') child.remove();
+      const actualGain = Math.min(amount, remainingToday);
+      const today = getTodayString();
+
+      // update streak if first activity today
+      if (state.lastActiveDate !== today) {
+        state.streak += 1;
+        state.lastActiveDate = today;
+      }
+
+      state.currentXp += actualGain;
+      state.todayXp += actualGain;
+      state.totalXpEarned += actualGain;
+
+      let targetXp = xpRequiredForLevel(state.level);
+      let didLevelUp = false;
+
+      while (state.currentXp >= targetXp && state.level < MAX_LEVEL) {
+        state.currentXp -= targetXp;
+        state.level += 1;
+        targetXp = xpRequiredForLevel(state.level);
+        didLevelUp = true;
+      }
+
+      // log entry
+      state.tasks.unshift({
+        id: 'task-' + Date.now(),
+        text: taskName.toLowerCase(),
+        xp: actualGain,
+        isPenalty: false,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).toLowerCase(),
+        date: today
       });
 
-      gameState.tasks.forEach(task => {
-        const item = document.createElement('div');
-        item.className = 'py-3 px-2 themed-btn transition flex items-start justify-between gap-3 hover:brightness-110';
-        item.style.backgroundColor = 'var(--bg-subtle)';
+      if (didLevelUp) {
+        playSound('levelup');
+        spawnFloatingToast(`level up! reached lvl ${state.level}`, "var(--primary)");
+      } else {
+        playSound('task');
+        spawnFloatingToast(`+${actualGain} xp`, "var(--primary)");
+      }
 
-        item.innerHTML = `
-          <div class="flex items-start gap-3">
-            <div class="mt-0.5 w-6 h-6 themed-btn border flex items-center justify-center text-xs" style="border-color: var(--border-color); color: var(--primary);">
-              ✓
-            </div>
-            <div>
-              <p class="text-sm font-medium break-words" style="color: var(--text-main);">${escapeHTML(task.title)}</p>
-              <div class="flex items-center gap-2 mt-1 text-[11px]" style="color: var(--text-muted);">
-                <span>${task.timestamp}</span>
-                <span>•</span>
-                <span class="capitalize font-mono">${task.tier || 'standard'} tier</span>
-              </div>
-            </div>
-          </div>
-          <span class="px-2.5 py-1 themed-btn text-xs font-mono font-bold border whitespace-nowrap" style="background: var(--primary-glow); border-color: var(--primary); color: var(--primary);">
-            +${task.xp} XP
-          </span>
-        `;
-        container.appendChild(item);
-      });
+      saveState();
+      renderUI();
     }
 
-    function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, tag => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        "'": '&#39;',
-        '"': '&quot;'
-      }[tag] || tag));
+    /* -------------------------------------------------------------
+       USER INTERACTIONS
+    -------------------------------------------------------------- */
+    function selectTier(xp, btnElement) {
+      state.selectedTierXp = xp;
+      document.querySelectorAll('.tier-pill').forEach(b => b.classList.remove('active'));
+      if (btnElement) btnElement.classList.add('active');
+      document.getElementById('customXp').value = '';
     }
 
-    /* ============================================================
-     * LOCAL STORAGE
-     * ============================================================ */
-    function saveGameState() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
-      } catch (e) {
-        console.error('Save failed', e);
+    function onCustomXpInput(input) {
+      const val = parseInt(input.value, 10);
+      if (!isNaN(val) && val > 0) {
+        state.selectedTierXp = Math.min(250, val);
+        document.querySelectorAll('.tier-pill').forEach(b => b.classList.remove('active'));
       }
     }
 
-    function loadGameState() {
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          gameState = { ...gameState, ...parsed };
-        }
-      } catch (e) {
-        console.error('Load failed', e);
+    function appendTag(tag) {
+      const input = document.getElementById('taskInput');
+      const cur = input.value.trim();
+      if (!cur.includes(tag)) {
+        input.value = cur ? `${cur} ${tag}` : tag;
+      }
+      input.focus();
+    }
+
+    function submitTask() {
+      const input = document.getElementById('taskInput');
+      const val = input.value.trim().toLowerCase();
+      if (!val) return;
+
+      const xp = state.selectedTierXp || 15;
+      addXP(xp, val);
+
+      input.value = '';
+      input.focus();
+    }
+
+    function deleteTask(id) {
+      const idx = state.tasks.findIndex(t => t.id === id);
+      if (idx !== -1) {
+        state.tasks.splice(idx, 1);
+        saveState();
+        renderLog();
       }
     }
 
-    /* ============================================================
-     * INITIALIZATION & EVENT LISTENERS
-     * ============================================================ */
-    document.addEventListener('DOMContentLoaded', () => {
-      loadGameState();
-      applyThemeAndPalette(gameState.currentTemplate, gameState.currentPalette);
-      checkDateAndApplyPenalties();
-      updateUI();
-
-      // Theme Customizer Modal handlers
-      const themeModal = document.getElementById('themeModal');
-      document.getElementById('themeModalOpenBtn').addEventListener('click', () => {
-        themeModal.classList.remove('hidden');
+    function setPalette(themeClass) {
+      document.body.className = themeClass;
+      state.activePalette = themeClass;
+      document.querySelectorAll('[data-theme]').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-theme') === themeClass);
       });
-      document.getElementById('themeModalCloseBtn').addEventListener('click', () => {
-        themeModal.classList.add('hidden');
+      saveState();
+    }
+
+    function selectAvatar(avatarKey) {
+      state.activeAvatar = avatarKey;
+      document.querySelectorAll('.avatar-btn').forEach(btn => {
+        btn.classList.toggle('selected', btn.getAttribute('data-avatar') === avatarKey);
       });
-      document.getElementById('applyThemeBtn').addEventListener('click', () => {
-        themeModal.classList.add('hidden');
-        showToast('UI Template & Palette Applied!', '🎨');
-      });
+      document.getElementById('currentAvatarSlot').innerHTML = AVATAR_SVGS[avatarKey];
+      document.getElementById('operativeName').textContent = `operative: ${AVATAR_NAMES[avatarKey]}`;
+      saveState();
+    }
 
-      // Template Selection Clicks
-      document.querySelectorAll('.template-card').forEach(card => {
-        card.addEventListener('click', () => {
-          const tpl = card.dataset.tpl;
-          applyThemeAndPalette(tpl, gameState.currentPalette);
-          SoundEngine.playXpTick();
-        });
-      });
+    function setLogFilter(filter, btn) {
+      activeFilter = filter;
+      document.querySelectorAll('.log-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderLog();
+    }
 
-      // Palette Selection Clicks
-      document.querySelectorAll('.palette-card').forEach(card => {
-        card.addEventListener('click', () => {
-          const pal = card.dataset.pal;
-          applyThemeAndPalette(gameState.currentTemplate, pal);
-          SoundEngine.playXpTick();
-        });
-      });
-
-      // Quick Cycle Shortcut in header sub-bar
-      document.getElementById('quickPresetCycleBtn').addEventListener('click', () => {
-        const palettes = Object.keys(COLOR_PALETTES);
-        const currentIndex = palettes.indexOf(gameState.currentPalette);
-        const nextIndex = (currentIndex + 1) % palettes.length;
-        applyThemeAndPalette(gameState.currentTemplate, palettes[nextIndex]);
-        showToast(`Theme Swapped: ${COLOR_PALETTES[palettes[nextIndex]].name}`, '⚡');
-        SoundEngine.playXpTick();
-      });
-
-      // Task Tier buttons
-      const tierBtns = document.querySelectorAll('.tier-btn');
-      tierBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          tierBtns.forEach(b => {
-            b.classList.remove('active-tier');
-            b.style.background = 'var(--bg-subtle)';
-            b.style.borderColor = 'var(--border-color)';
-          });
-
-          btn.classList.add('active-tier');
-          btn.style.background = 'var(--primary-glow)';
-          btn.style.borderColor = 'var(--primary)';
-          selectedTier = btn.dataset.tier;
-          updateSubmitPreviewTag();
-        });
-      });
-
-      // Custom XP toggle
-      const customToggle = document.getElementById('customXpToggle');
-      const customInputContainer = document.getElementById('customXpInputContainer');
-      const customInput = document.getElementById('customXpInput');
-
-      customToggle.addEventListener('change', (e) => {
-        if (e.target.checked) {
-          customInputContainer.classList.remove('hidden');
-          customInput.focus();
-        } else {
-          customInputContainer.classList.add('hidden');
-        }
-        updateSubmitPreviewTag();
-      });
-
-      customInput.addEventListener('input', updateSubmitPreviewTag);
-
-      function updateSubmitPreviewTag() {
-        const tag = document.getElementById('earnedPreviewTag');
-        if (customToggle.checked && customInput.value) {
-          tag.innerText = `+${customInput.value} XP`;
-        } else {
-          tag.innerText = `+${CONFIG.TIERS[selectedTier].xp} XP`;
-        }
+    function copyLogToClipboard() {
+      if (state.tasks.length === 0) {
+        alert("log book is empty right now.");
+        return;
       }
+      const lines = state.tasks.map(t => `[${t.timestamp}] ${t.text} (${t.xp >= 0 ? '+' : ''}${t.xp} xp)`);
+      navigator.clipboard.writeText(lines.join('\n')).then(() => {
+        alert("log copied to clipboard!");
+      });
+    }
 
-      // Quick shortcut presets
-      document.querySelectorAll('.quick-preset').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const text = btn.innerText.replace(/\(\+\d+\sXP\)/, '').trim();
-          document.getElementById('taskInput').value = text;
-          if (text.includes('Homework')) {
-            document.querySelector('[data-tier="hard"]').click();
-          } else if (text.includes('Habit')) {
-            document.querySelector('[data-tier="light"]').click();
-          } else {
-            document.querySelector('[data-tier="medium"]').click();
-          }
-          document.getElementById('taskInput').focus();
-        });
+    function resetAllProgress() {
+      if (confirm("are you sure you want to completely reset all progress back to level 1 and wipe the log?")) {
+        localStorage.removeItem('daily_xp_grind_clean_state');
+        state = {
+          level: 1,
+          currentXp: 0,
+          totalXpEarned: 0,
+          todayXp: 0,
+          lastActiveDate: null,
+          streak: 0,
+          selectedTierXp: 15,
+          activePalette: 'theme-lime',
+          activeAvatar: 'coder',
+          soundEnabled: true,
+          tasks: []
+        };
+        renderUI();
+        alert("all progress reset.");
+      }
+    }
+
+    function spawnFloatingToast(text, color) {
+      const toast = document.createElement('div');
+      toast.className = 'floating-xp';
+      toast.style.left = '50%';
+      toast.style.top = '40%';
+      toast.style.color = color || 'var(--primary)';
+      toast.textContent = text.toLowerCase();
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 1200);
+    }
+
+    /* -------------------------------------------------------------
+       RENDERING
+    -------------------------------------------------------------- */
+    function renderUI() {
+      // level & xp bar
+      document.getElementById('lvlDisplay').textContent = `lvl ${state.level}`;
+      document.getElementById('rankDisplay').textContent = getRankTitle(state.level);
+
+      const targetXp = xpRequiredForLevel(state.level);
+      document.getElementById('currentXpText').textContent = state.currentXp;
+      document.getElementById('targetXpText').textContent = targetXp;
+
+      const pct = Math.min(100, Math.max(0, (state.currentXp / targetXp) * 100));
+      document.getElementById('xpBarFill').style.width = `${pct}%`;
+
+      // metrics
+      document.getElementById('streakDisplay').textContent = `${state.streak} ${state.streak === 1 ? 'day' : 'days'}`;
+      document.getElementById('todayXpDisplay').textContent = `${state.todayXp} / ${DAILY_CAP} xp`;
+      document.getElementById('totalXpDisplay').textContent = `${state.totalXpEarned} xp`;
+
+      // avatars & theme
+      setPalette(state.activePalette || 'theme-lime');
+      selectAvatar(state.activeAvatar || 'coder');
+
+      renderLog();
+    }
+
+    function renderLog() {
+      const feed = document.getElementById('logFeed');
+      const searchQuery = (document.getElementById('searchLog').value || '').toLowerCase().trim();
+      const today = getTodayString();
+
+      let filtered = state.tasks.filter(t => {
+        if (searchQuery && !t.text.toLowerCase().includes(searchQuery)) return false;
+        if (activeFilter === 'today') return t.date === today;
+        if (activeFilter === 'penalties') return t.isPenalty;
+        if (activeFilter === 'high') return t.xp >= 60;
+        return true;
       });
 
-      // Form Submit
-      const form = document.getElementById('taskForm');
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const input = document.getElementById('taskInput');
-        const taskText = input.value.trim();
+      document.getElementById('logCountText').textContent = `(${state.tasks.length} entries)`;
 
-        if (!taskText) return;
-
-        let xp = CONFIG.TIERS[selectedTier].xp;
-        if (customToggle.checked && customInput.value) {
-          const customVal = parseInt(customInput.value, 10);
-          if (!isNaN(customVal) && customVal > 0) xp = customVal;
-        }
-
-        logTask(taskText, xp);
-        input.value = '';
-        input.focus();
-      });
-
-      // Simulate Missed Day penalty tester
-      document.getElementById('simulateMissedDayBtn').addEventListener('click', () => {
-        const fakeDate = new Date();
-        fakeDate.setDate(fakeDate.getDate() - 2);
-        gameState.lastActiveDate = fakeDate.toISOString().split('T')[0];
-        applyMissedDayPenalty(1);
-      });
-
-      // Close modal
-      document.getElementById('closeLevelUpBtn').addEventListener('click', () => {
-        document.getElementById('levelUpModal').classList.add('hidden');
-      });
-
-      // Audio Toggle
-      document.getElementById('soundToggleBtn').addEventListener('click', () => {
-        gameState.soundEnabled = !gameState.soundEnabled;
-        if (gameState.soundEnabled) SoundEngine.init();
-        saveGameState();
-        updateUI();
-      });
-
-      // Reset Save Data Dialog
-      document.getElementById('resetDataBtn').addEventListener('click', () => {
-        if (document.getElementById('resetConfirmModal')) return;
-
-        const confirmDiv = document.createElement('div');
-        confirmDiv.id = 'resetConfirmModal';
-        confirmDiv.className = 'fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4';
-        confirmDiv.innerHTML = `
-          <div class="themed-card border border-rose-500/50 max-w-sm w-full p-5 text-center shadow-2xl">
-            <h3 class="text-lg font-bold font-app-title" style="color: var(--text-main);">Reset All Progress?</h3>
-            <p class="text-xs mt-2" style="color: var(--text-muted);">This will wipe your level, streak, XP and quest history permanently.</p>
-            <div class="grid grid-cols-2 gap-3 mt-5">
-              <button id="cancelResetBtn" class="py-2 themed-btn border text-xs font-semibold" style="background: var(--bg-subtle); border-color: var(--border-color); color: var(--text-main);">Cancel</button>
-              <button id="confirmResetBtn" class="py-2 themed-btn bg-rose-600 text-white text-xs font-semibold hover:bg-rose-500 shadow-md">Wipe Save</button>
-            </div>
+      if (filtered.length === 0) {
+        feed.innerHTML = `
+          <div class="empty-state">
+            ${state.tasks.length === 0 ? 'no quests completed yet. type a task above to earn your first xp!' : 'no tasks match this filter.'}
           </div>
         `;
-        document.body.appendChild(confirmDiv);
+        return;
+      }
 
-        document.getElementById('cancelResetBtn').addEventListener('click', () => confirmDiv.remove());
-        document.getElementById('confirmResetBtn').addEventListener('click', () => {
-          const currentTpl = gameState.currentTemplate;
-          const currentPal = gameState.currentPalette;
-          localStorage.removeItem(STORAGE_KEY);
-          gameState = {
-            level: 1,
-            currentXp: 0,
-            totalXpEarned: 0,
-            streak: 0,
-            lastActiveDate: null,
-            todayXp: 0,
-            todayDate: null,
-            tasks: [],
-            soundEnabled: true,
-            currentTemplate: currentTpl,
-            currentPalette: currentPal
-          };
-          confirmDiv.remove();
-          updateUI();
-          showToast('Game progress has been reset.', '🔄');
-        });
-      });
+      feed.innerHTML = filtered.map(t => `
+        <div class="log-item ${t.isPenalty ? 'penalty' : ''}">
+          <div class="log-item-left">
+            <span class="log-time">${t.timestamp}</span>
+            <span class="log-text">${escapeHtml(t.text)}</span>
+          </div>
+          <div class="log-item-right">
+            <span class="log-xp-badge">${t.xp >= 0 ? '+' : ''}${t.xp} xp</span>
+            <button class="delete-item-btn" onclick="deleteTask('${t.id}')" title="delete entry">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
 
-      // Clear History Only
-      document.getElementById('clearHistoryBtn').addEventListener('click', () => {
-        gameState.tasks = [];
-        saveGameState();
-        renderTaskFeed();
-        showToast('History logs cleared.', '🗑️');
-      });
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    /* -------------------------------------------------------------
+       STORAGE PERSISTENCE
+    -------------------------------------------------------------- */
+    function saveState() {
+      localStorage.setItem('daily_xp_grind_clean_state', JSON.stringify(state));
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem('daily_xp_grind_clean_state');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          state = { ...state, ...parsed };
+        }
+      } catch (e) {
+        console.warn("error loading state", e);
+      }
+    }
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      auditStreakAndDay();
+      renderUI();
     });
   </script>
 </body>
